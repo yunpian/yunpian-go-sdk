@@ -30,7 +30,7 @@ var DevConf = &YunpianConf{
         Charset: "utf-8"},
 }
 
-const TEST_APIKEY = "2daab1114c69c9c41d1172b0ad8c392d"
+const TEST_APIKEY = ""
 
 var TestClnt = New(TEST_APIKEY).WithConf(DevConf)
 
