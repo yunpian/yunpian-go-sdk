@@ -1,4 +1,4 @@
-package api
+package sdk
 
 /**
  * @author dzh
@@ -16,6 +16,6 @@ type SignApiImpl struct {
 
 func NewSign() SignApi {
     sign := &SignApiImpl{}
-    sign.name = Sign
+    sign.name = SIGN
     return sign
 }

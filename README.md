@@ -8,6 +8,12 @@ yunpian-go-sdk
 ```go
 import ypclnt "github.com/yunpian/yupian-go-client/sdk"
 
+// 发送短信API
+clnt := ypclnt.New("apikey")
+param := ypclnt.NewParam(2)
+param[ypclnt.Mobile] = "18616020***"
+param[ypclnt.Text] = "【云片网】您的验证码是1234"
+r := ypclnt.sms().single_send(param)
 
 
 ```

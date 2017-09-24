@@ -1,4 +1,4 @@
-package api
+package sdk
 
 /**
  * @author dzh
@@ -16,6 +16,6 @@ type SmsApiImpl struct {
 
 func NewSms() SmsApi {
     sms := &SmsApiImpl{}
-    sms.name = Sign
+    sms.name = SMS
     return sms
 }

@@ -1,4 +1,4 @@
-package api
+package sdk
 
 /**
  * @author dzh
@@ -16,6 +16,6 @@ type UserApiImpl struct {
 
 func NewUser() UserApi {
     user := &UserApiImpl{}
-    user.name = User
+    user.name = USER
     return user
 }

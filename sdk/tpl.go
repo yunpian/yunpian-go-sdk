@@ -1,4 +1,4 @@
-package api
+package sdk
 
 /**
  * @author dzh
@@ -16,6 +16,6 @@ type TplApiImpl struct {
 
 func NewTpl() TplApi {
     tpl := &TplApiImpl{}
-    tpl.name = Tpl
+    tpl.name = TPL
     return tpl
 }

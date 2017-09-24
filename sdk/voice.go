@@ -1,4 +1,4 @@
-package api
+package sdk
 
 /**
  * @author dzh
@@ -16,6 +16,6 @@ type VoiceApiImpl struct {
 
 func NewVoice() VoiceApi {
     voice := &VoiceApiImpl{}
-    voice.name = Tpl
+    voice.name = VOICE
     return voice
 }

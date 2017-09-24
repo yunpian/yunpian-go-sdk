@@ -1,12 +1,21 @@
 package sdk
 
-import "testing"
+import (
+    "testing"
+    "strings"
+    "io/ioutil"
+)
 
 /**
  * @author dzh
- * @date 20/09/2017 22:10
+ * @date 24/09/2017 21:57
  * @since 0.0.1
  */
+
+func TestUrl(t *testing.T) {
+    url := strings.Join([]string{"1", "v2", "send.json"}, "/")
+    t.Log(url)
+}
 
 var DevConf = &YunpianConf{
     Version:   "v2",
@@ -21,11 +30,16 @@ var DevConf = &YunpianConf{
         Charset: "utf-8"},
 }
 
-const APIKEY = "2daab1114c69c9c41d1172b0ad8c392d"
+const TEST_APIKEY = "2daab1114c69c9c41d1172b0ad8c392d"
+
+var TestClnt = New(TEST_APIKEY).WithConf(DevConf)
 
 func TestHttpPost(t *testing.T) {
-    clnt := New(APIKEY)
-    clnt.WithConf(DevConf)
-    rsp, err := clnt.Post("https://test-api.yunpian.com/v2/user/get.json", "apikey="+APIKEY, nil, "")
-    t.Log(rsp, err)
+    rsp, err := TestClnt.Post("https://test-api.yunpian.com/v2/user/get.json", "apikey="+TEST_APIKEY, nil, "")
+    if err == nil {
+        defer rsp.Body.Close()
+        body, _ := ioutil.ReadAll(rsp.Body)
+        t.Log(string(body))
+    }
+
 }

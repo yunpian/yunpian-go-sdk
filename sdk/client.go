@@ -9,28 +9,37 @@ package sdk
 import (
     "net/http"
     "time"
-    "github.com/yunpian/yunpian-go-sdk/sdk/api"
+    "net"
+    "strings"
 )
 
 type YunpianClient interface {
-    Flow() api.FlowApi
-    Sign() api.SignApi
-    Sms() api.SmsApi
-    Tpl() api.TplApi
-    User() api.UserApi
-    Voice() api.VoiceApi
-
-    api(name string) api.YunpianApi
+    Flow() FlowApi
+    Sign() SignApi
+    Sms() SmsApi
+    Tpl() TplApi
+    User() UserApi
+    Voice() VoiceApi
 
     Apikey() string
     Conf() *YunpianConf
 
+    // WithConf to initialize YunpianClient and inner *http.Client
     WithConf(conf *YunpianConf) YunpianClient
+    // WithHttp to initialize inner *http.Client
     WithHttp(http *http.Client) YunpianClient
 
-    Post(url string, data string, headers map[string]string, charset string) (string, error)
+    HttpClnt() *http.Client
+    Post(url string, data string, headers map[string]string, charset string) (*http.Response, error)
 
     Close()
+}
+
+func NewParam(capacity int) map[string]string {
+    if capacity < 1 {
+        capacity = 0
+    }
+    return make(map[string]string, capacity+1)
 }
 
 type YunpianConf struct {
@@ -58,7 +67,7 @@ type HttpConf struct {
     Charset string
 }
 
-var OnlineConf = &YunpianConf{
+var DefOnlineConf = &YunpianConf{
     Version:   "v2",
     UserHost:  "https://sms.yunpian.com",
     SignHost:  "https://sms.yunpian.com",
@@ -74,4 +83,121 @@ var OnlineConf = &YunpianConf{
 var DefHeaders = map[string]string{
     "Api-Lang":   "go",
     "Connection": "keep-alive",
+}
+
+type HttpClnt struct {
+    apikey string
+    conf   YunpianConf
+    http   *http.Client
+}
+
+func New(apikey string) YunpianClient {
+    return &HttpClnt{
+        apikey,
+        *DefOnlineConf,
+        createHttp(DefOnlineConf),
+    }
+}
+
+func createHttp(conf *YunpianConf) *http.Client {
+    tr := &http.Transport{
+        DialContext: (&net.Dialer{
+            Timeout:   conf.Http.Timeout * time.Second,
+            KeepAlive: conf.Http.KeepAlive * time.Second,
+            DualStack: true,
+        }).DialContext,
+        MaxIdleConns:        conf.Http.MaxIdleConns,
+        IdleConnTimeout:     conf.Http.IdleConnTimeout * time.Second,
+        TLSHandshakeTimeout: conf.Http.TLSHandshakeTimeout * time.Second,
+    }
+    return &http.Client{Transport: tr}
+}
+
+func (clnt *HttpClnt) WithConf(conf *YunpianConf) YunpianClient {
+    if conf != nil {
+        clnt.conf = *conf
+    }
+    clnt.http = createHttp(&clnt.conf)
+    return clnt
+}
+
+func (clnt *HttpClnt) WithHttp(http *http.Client) YunpianClient {
+    if http != nil {
+        clnt.http = http
+    }
+    return clnt
+}
+
+func (clnt *HttpClnt) HttpClnt() *http.Client {
+    return clnt.http
+}
+
+func (clnt *HttpClnt) Conf() *YunpianConf {
+    return &clnt.conf
+}
+
+func (clnt *HttpClnt) Apikey() string {
+    return clnt.apikey
+}
+
+func (clnt *HttpClnt) Flow() FlowApi {
+    flow := NewFlow()
+    flow.Init(clnt).SetHost(clnt.Conf().FlowHost)
+    return flow
+    //return clnt.api(Flow).(FlowApi)
+}
+
+func (clnt *HttpClnt) Sign() SignApi {
+    sign := NewSign()
+    sign.Init(clnt).SetHost(clnt.conf.SignHost)
+    return sign
+}
+
+func (clnt *HttpClnt) Sms() SmsApi {
+    sms := NewSms()
+    sms.Init(clnt).SetHost(clnt.conf.SmsHost)
+    return sms
+}
+
+func (clnt *HttpClnt) Tpl() TplApi {
+    tpl := NewTpl()
+    tpl.Init(clnt).SetHost(clnt.conf.TplHost)
+    return tpl
+}
+
+func (clnt *HttpClnt) User() UserApi {
+    user := NewUser()
+    user.Init(clnt).SetHost(clnt.conf.UserHost)
+    return user
+}
+
+func (clnt *HttpClnt) Voice() VoiceApi {
+    voice := NewVoice()
+    voice.Init(clnt).SetHost(clnt.conf.VoiceHost)
+    return voice
+}
+
+func (clnt *HttpClnt) Post(url string, data string, headers map[string]string, charset string) (*http.Response, error) {
+    req, err := http.NewRequest("POST", url, strings.NewReader(data))
+    if err != nil {
+        return nil, err
+    }
+    if charset == "" {
+        charset = clnt.conf.Http.Charset
+    }
+    req.Header.Add("Content-Type", "application/x-www-form-urlencoded;charset="+charset)
+    //add headers
+    for key, val := range DefHeaders {
+        req.Header.Add(key, val)
+    }
+    if headers != nil {
+        for key, val := range headers {
+            req.Header.Set(key, val)
+        }
+    }
+    return clnt.http.Do(req)
+}
+
+func (clnt *HttpClnt) Close() {
+    //
 }
