@@ -6,16 +6,16 @@ yunpian-go-sdk
 - 使用云片sdk
 
 ```go
-import ypclnt "github.com/yunpian/yupian-go-client/sdk"
+import ypclnt "github.com/yunpian/yunpian-go-sdk/sdk"
 
-// 发送短信示例
+// 发送短信
 clnt := ypclnt.New("apikey")
 param := ypclnt.NewParam(2)
-param[ypclnt.MOBILE] = "18616020***"
+param[ypclnt.MOBILE] = "18616020610"
 param[ypclnt.TEXT] = "【云片网】您的验证码是1234"
-r := ypclnt.sms().single_send(param)
+r := clnt.Sms().SingleSend(param)
 
-//账户:clnt.user() 签名:clnt.sign() 模版:clnt.tpl() 短信:clnt.sms() 语音:clnt.voice() 流量:clnt.flow()
+//账户:clnt.User() 签名:clnt.Sign() 模版:clnt.Tpl() 短信:clnt.Sms() 语音:clnt.Voice() 流量:clnt.Flow()
 ```
 
 ## 配置说明
