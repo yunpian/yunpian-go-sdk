@@ -12,8 +12,10 @@ import (
 
 func TestGetPackage(t *testing.T) {
     flow := TestClnt.Flow()
-    r := flow.GetPackage()
+    r := flow.GetPackage(nil)
     t.Log(r)
+    sn := r.Data.([]interface{})[0].(map[string]interface{})[SN].(float64)
+    t.Log(int(sn))
 
     //flow.SetVersion(V1)
     //r = flow.GetPackage()
@@ -37,7 +39,7 @@ func TestRecharset(t *testing.T) {
 func TestPullStatus(t *testing.T) {
     flow := TestClnt.Flow()
 
-    r := flow.PullStatus()
+    r := flow.PullStatus(nil)
     t.Log(r)
 
     //flow.SetVersion(V1)

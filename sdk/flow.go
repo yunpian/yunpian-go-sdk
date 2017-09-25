@@ -14,17 +14,17 @@ import (
 
 type FlowApi interface {
     YunpianApi
-    GetPackage() *Result
+    GetPackage(param map[string]string) *Result
     Recharge(param map[string]string) *Result
-    PullStatus() *Result
+    PullStatus(param map[string]string) *Result
 }
 
-type FlowApiImpl struct {
+type FlowApiOption struct {
     YunpianApiOption
 }
 
 func NewFlow() FlowApi {
-    flow := &FlowApiImpl{}
+    flow := &FlowApiOption{}
     flow.name = FLOW
     return flow
 }
@@ -41,14 +41,16 @@ func NewFlow() FlowApi {
 // carrier String 否 运营商ID 传入该参数则获取指定运营商的流量包， 否则获取所有运营商的流量包 移动：10086 联通：10010
 // 电信：10000
 // </p>
-func (flow *FlowApiImpl) GetPackage() (r *Result) {
+func (flow *FlowApiOption) GetPackage(param map[string]string) (r *Result) {
     r = new(Result)
     defer func() {
         if e := recover(); e != nil {
             r.Error(fmt.Errorf("%v", e))
         }
     }()
-    param := make(map[string]string, 1)
+    if param == nil {
+        param = make(map[string]string, 1)
+    }
     must := []string{APIKEY}
     if err := flow.VerifyParam(param, must, r); err != nil {
         return r.Error(err)
@@ -94,13 +96,16 @@ func (flow *FlowApiImpl) GetPackage() (r *Result) {
 // <p>
 // _sign String 否 签名字段 参考使用加密 393d079e0a00912335adfe46f4a2e10f (不再使用)
 // </p>
-func (flow *FlowApiImpl) Recharge(param map[string]string) (r *Result) {
+func (flow *FlowApiOption) Recharge(param map[string]string) (r *Result) {
     r = new(Result)
     defer func() {
         if e := recover(); e != nil {
             r.Error(fmt.Errorf("%v", e))
         }
     }()
+    if param == nil {
+        param = NewParam(0)
+    }
     must := []string{APIKEY, MOBILE, SN}
     if err := flow.VerifyParam(param, must, r); err != nil {
         return r.Error(err)
@@ -133,14 +138,16 @@ func (flow *FlowApiImpl) Recharge(param map[string]string) (r *Result) {
 // <p>
 // page_size 否 每页个数，最大100个，默认20个 20
 // </p>
-func (flow *FlowApiImpl) PullStatus() (r *Result) {
+func (flow *FlowApiOption) PullStatus(param map[string]string) (r *Result) {
     r = new(Result)
     defer func() {
         if e := recover(); e != nil {
             r.Error(fmt.Errorf("%v", e))
         }
     }()
-    param := make(map[string]string, 1)
+    if param == nil {
+        param = make(map[string]string, 1)
+    }
     must := []string{APIKEY}
     if err := flow.VerifyParam(param, must, r); err != nil {
         return r.Error(err)

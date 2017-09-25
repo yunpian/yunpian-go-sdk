@@ -157,7 +157,7 @@ func (h *YunpianResultHandler) Code(rsp interface{}, version string) int {
 }
 
 func (h *YunpianResultHandler) Parse(rsp []byte) interface{} {
-    var r interface{}
+    var r interface{} //TODO custom decode struct
     if err := json.NewDecoder(bytes.NewBuffer(rsp)).Decode(&r); err != nil {
         panic("Parse rsp:" + err.Error())
     }

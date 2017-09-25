@@ -35,13 +35,6 @@ type YunpianClient interface {
     Close()
 }
 
-func NewParam(capacity int) map[string]string {
-    if capacity < 1 {
-        capacity = 0
-    }
-    return make(map[string]string, capacity+1)
-}
-
 type YunpianConf struct {
     Version string
 
@@ -79,6 +72,7 @@ var DefOnlineConf = &YunpianConf{
     Http: &HttpConf{Timeout: 30, KeepAlive: 30, MaxIdleConns: 100, IdleConnTimeout: 30, TLSHandshakeTimeout: 10,
         Charset: "utf-8"},
 }
+
 
 var DefHeaders = map[string]string{
     "Api-Lang":   "go",

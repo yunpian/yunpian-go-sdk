@@ -23,7 +23,7 @@ type PS struct {
 func TestP(t *testing.T) {
     var p interface{}
     t.Log(p)
-    x :=handle(&p)
+    x := handle(&p)
     t.Log(x)
     t.Log(p)
     //var p PS
@@ -43,7 +43,7 @@ func TestP(t *testing.T) {
     //}
 }
 
-func handle(p *interface{}) interface{}{
+func handle(p *interface{}) interface{} {
     fmt.Println(p)
     if p == nil {
         fmt.Println("handle nil")
