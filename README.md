@@ -40,7 +40,10 @@ clnt.WithHttp(customHttp) //*http.Client
     - tpl.go    模版
     - user.go   用户
     - voice.go  语音
-    - util.go   工具函数·
+    - util.go   工具函数
+- 分支说明
+    - master最新稳定发布版本
+    - develop待发布版本，贡献的代码请pull request到这里:)
 
 ## 联系我们
 [云片支持 QQ](https://static.meiqia.com/dist/standalone.html?eid=30951&groupid=0d20ab23ab4702939552b3f81978012f&metadata={"name":"github"})
