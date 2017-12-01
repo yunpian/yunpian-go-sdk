@@ -147,3 +147,270 @@ func (sms *SMS) BatchSend(input *BatchSendRequest) (*BatchSendResponse, error) {
 
 	return &result, nil
 }
+
+// MultiSendRequest - 批量个性化发送请求参数
+type MultiSendRequest struct {
+	Mobile      string `schema:"mobile"`
+	Text        string `schema:"text"`
+	Extend      string `schema:"extend"`
+	CallbackURL string `schema:"callback_url"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *MultiSendRequest) Verify() error {
+	if len(req.Mobile) == 0 {
+		return errors.New("Miss param: mobile")
+	}
+	if len(req.Text) == 0 {
+		return errors.New("Miss param: text")
+	}
+
+	return nil
+}
+
+// MultiSendResponse - 批量个性化发送响应
+type MultiSendResponse struct {
+	TotalCount int                  `json:"total_count"`
+	TotalFee   string               `json:"total_fee"`
+	Unit       string               `json:"unit"`
+	Data       []SingleSendResponse `json:"data"`
+}
+
+// MultiSend - 批量个性化发送接口
+func (sms *SMS) MultiSend(input *MultiSendRequest) (*MultiSendResponse, error) {
+	if input == nil {
+		input = &MultiSendRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/multi_send.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result MultiSendResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// TPLSingleSendRequest - 指定模板单发请求参数
+type TPLSingleSendRequest struct {
+	Mobile   string `schema:"mobile"`
+	TPLID    int64  `schema:"tpl_id"`
+	TPLValue string `schema:"tpl_value"`
+	Extend   string `schema:"extend"`
+	UID      string `schema:"uid"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *TPLSingleSendRequest) Verify() error {
+	if len(req.Mobile) == 0 {
+		return errors.New("Miss param: mobile")
+	}
+	if req.TPLID == 0 {
+		return errors.New("Miss param: tpl_id")
+	}
+	if len(req.TPLValue) == 0 {
+		return errors.New("Miss param: tpl_value")
+	}
+
+	return nil
+}
+
+// TPLSingleSend - 指定模板单发接口
+func (sms *SMS) TPLSingleSend(input *TPLSingleSendRequest) (*SingleSendResponse, error) {
+	if input == nil {
+		input = &TPLSingleSendRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/tpl_single_send.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result SingleSendResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// TPLBatchSendRequest - 指定模板群发请求参数
+type TPLBatchSendRequest struct {
+	Mobile   string `schema:"mobile"`
+	TPLID    int64  `schema:"tpl_id"`
+	TPLValue string `schema:"tpl_value"`
+	Extend   string `schema:"extend"`
+	UID      string `schema:"uid"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *TPLBatchSendRequest) Verify() error {
+	if len(req.Mobile) == 0 {
+		return errors.New("Miss param: mobile")
+	}
+	if req.TPLID == 0 {
+		return errors.New("Miss param: tpl_id")
+	}
+	if len(req.TPLValue) == 0 {
+		return errors.New("Miss param: tpl_value")
+	}
+
+	return nil
+}
+
+// TPLBatchSend - 指定模板群发
+func (sms *SMS) TPLBatchSend(input *TPLBatchSendRequest) (*BatchSendResponse, error) {
+	if input == nil {
+		input = &TPLBatchSendRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/tpl_batch_send.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result BatchSendResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// PullStatusRequest - 获取状态报告请求参数
+type PullStatusRequest struct {
+	PageSize int `schema:"page_size"`
+}
+
+// PullStatusResponse - 获取状态报告响应
+type PullStatusResponse struct {
+	SID             int64  `json:"sid"`
+	UID             string `json:"uid"`
+	UserReceiveTime string `json:"user_receive_time"`
+	ErrorMessage    string `json:"error_msg"`
+	Mobile          string `json:"mobile"`
+	ReportStatus    string `json:"report_status"`
+}
+
+// PullStatus - 获取状态报告接口
+func (sms *SMS) PullStatus(input *PullStatusRequest) ([]*PullStatusResponse, error) {
+	if input == nil {
+		input = &PullStatusRequest{}
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/pull_status.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result []*PullStatusResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// PullReplyRequest - 获取回复短信请求参数
+type PullReplyRequest struct {
+	PageSize int `schema:"page_size"`
+}
+
+// PullReplyResponse - 获取回复短信响应
+type PullReplyResponse struct {
+	ID         string `json:"id"`
+	Mobile     string `json:"mobile"`
+	Text       string `json:"text"`
+	ReplyTime  string `json:"reply_time"`
+	Extend     string `json:"extend"`
+	BaseExtend string `json:"base_extend"`
+	Sign       string `json:"_sign"`
+}
+
+// PullReply - 获取回复短信接口
+func (sms *SMS) PullReply(input *PullReplyRequest) ([]*PullReplyResponse, error) {
+	if input == nil {
+		input = &PullReplyRequest{}
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/pull_reply.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result []*PullReplyResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
