@@ -16,12 +16,12 @@ func (c *Client) SMS() *SMS {
 
 // SingleSendRequest - 单条短信发送参数
 type SingleSendRequest struct {
-	Mobile      string `schema:"mobile"`
-	Text        string `schema:"text"`
-	Extend      string `schema:"extend"`
-	UID         string `schema:"uid"`
-	CallbackURL string `schema:"callback_url"`
-	Register    bool   `schema:"register"`
+	Mobile      string `schema:"mobile,omitempty"`
+	Text        string `schema:"text,omitempty"`
+	Extend      string `schema:"extend,omitempty"`
+	UID         string `schema:"uid,omitempty"`
+	CallbackURL string `schema:"callback_url,omitempty"`
+	Register    bool   `schema:"register,omitempty"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -88,10 +88,10 @@ func (sms *SMS) SingleSend(input *SingleSendRequest) (*SingleSendResponse, error
 
 // BatchSendRequest - 批量发送请求参数
 type BatchSendRequest struct {
-	Mobile      string `schema:"mobile"`
-	Text        string `schema:"text"`
-	Extend      string `schema:"extend"`
-	CallbackURL string `schema:"callback_url"`
+	Mobile      string `schema:"mobile,omitempty"`
+	Text        string `schema:"text,omitempty"`
+	Extend      string `schema:"extend,omitempty"`
+	CallbackURL string `schema:"callback_url,omitempty"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -150,10 +150,10 @@ func (sms *SMS) BatchSend(input *BatchSendRequest) (*BatchSendResponse, error) {
 
 // MultiSendRequest - 批量个性化发送请求参数
 type MultiSendRequest struct {
-	Mobile      string `schema:"mobile"`
-	Text        string `schema:"text"`
-	Extend      string `schema:"extend"`
-	CallbackURL string `schema:"callback_url"`
+	Mobile      string `schema:"mobile,omitempty"`
+	Text        string `schema:"text,omitempty"`
+	Extend      string `schema:"extend,omitempty"`
+	CallbackURL string `schema:"callback_url,omitempty"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -212,11 +212,11 @@ func (sms *SMS) MultiSend(input *MultiSendRequest) (*MultiSendResponse, error) {
 
 // TPLSingleSendRequest - 指定模板单发请求参数
 type TPLSingleSendRequest struct {
-	Mobile   string `schema:"mobile"`
-	TPLID    int64  `schema:"tpl_id"`
-	TPLValue string `schema:"tpl_value"`
-	Extend   string `schema:"extend"`
-	UID      string `schema:"uid"`
+	Mobile   string `schema:"mobile,omitempty"`
+	TPLID    int64  `schema:"tpl_id,omitempty"`
+	TPLValue string `schema:"tpl_value,omitempty"`
+	Extend   string `schema:"extend,omitempty"`
+	UID      string `schema:"uid,omitempty"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -270,11 +270,11 @@ func (sms *SMS) TPLSingleSend(input *TPLSingleSendRequest) (*SingleSendResponse,
 
 // TPLBatchSendRequest - 指定模板群发请求参数
 type TPLBatchSendRequest struct {
-	Mobile   string `schema:"mobile"`
-	TPLID    int64  `schema:"tpl_id"`
-	TPLValue string `schema:"tpl_value"`
-	Extend   string `schema:"extend"`
-	UID      string `schema:"uid"`
+	Mobile   string `schema:"mobile,omitempty"`
+	TPLID    int64  `schema:"tpl_id,omitempty"`
+	TPLValue string `schema:"tpl_value,omitempty"`
+	Extend   string `schema:"extend,omitempty"`
+	UID      string `schema:"uid,omitempty"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -328,7 +328,7 @@ func (sms *SMS) TPLBatchSend(input *TPLBatchSendRequest) (*BatchSendResponse, er
 
 // PullStatusRequest - 获取状态报告请求参数
 type PullStatusRequest struct {
-	PageSize int `schema:"page_size"`
+	PageSize int `schema:"page_size,omitempty"`
 }
 
 // PullStatusResponse - 获取状态报告响应
@@ -372,7 +372,7 @@ func (sms *SMS) PullStatus(input *PullStatusRequest) ([]*PullStatusResponse, err
 
 // PullReplyRequest - 获取回复短信请求参数
 type PullReplyRequest struct {
-	PageSize int `schema:"page_size"`
+	PageSize int `schema:"page_size,omitempty"`
 }
 
 // PullReplyResponse - 获取回复短信响应
