@@ -35,7 +35,7 @@ type request struct {
 	ctx    context.Context
 }
 
-func (c *Client) newRequest(method, path string) *request {
+func (c *Client) newRequest(method, endpoint, path string) *request {
 	r := &request{
 		config: &c.config,
 		method: method,
@@ -45,7 +45,7 @@ func (c *Client) newRequest(method, path string) *request {
 	}
 
 	u := &url.URL{
-		Host: c.config.smsHost,
+		Host: endpoint,
 		Path: path,
 	}
 

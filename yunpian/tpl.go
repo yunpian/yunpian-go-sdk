@@ -1,6 +1,10 @@
 package yunpian
 
 import "errors"
+import "net/http"
+import "encoding/json"
+import "io/ioutil"
+import "fmt"
 
 // TPL is used to manipulate the tpl API
 type TPL struct {
@@ -15,7 +19,8 @@ func (c *Client) TPL() *TPL {
 // TPLAddRequest - 添加模版请求参数
 type TPLAddRequest struct {
 	Content    string `schema:"tpl_content,omitempty"`
-	NotifyType string `schema:"notify_type,omitempty"`
+	NotifyType int    `schema:"notify_type,omitempty"`
+	Language   string `schema:"lang,omitempty"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -26,12 +31,14 @@ func (req *TPLAddRequest) Verify() error {
 	return nil
 }
 
-// TPLResponse - 添加模版响应
+// TPLResponse - 模版响应
 type TPLResponse struct {
-	ID      int64  `json:"tpl_id"`
-	Content string `json:"tpl_content"`
-	Status  string `json:"check_status"`
-	Reason  string `json:"reason"`
+	ID          int64  `json:"tpl_id"`
+	Content     string `json:"tpl_content"`
+	Status      string `json:"check_status"`
+	Reason      string `json:"reason"`
+	Language    string `json:"lang"`
+	CountryCode string `json:"country_code"`
 }
 
 // Add - 添加模版接口
@@ -45,7 +52,7 @@ func (tpl *TPL) Add(input *TPLAddRequest) (*TPLResponse, error) {
 		return nil, err
 	}
 
-	r := tpl.c.newRequest("POST", "/v2/tpl/add.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/add.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)
@@ -92,7 +99,7 @@ func (tpl *TPL) Get(input *TPLGetRequest) (*TPLResponse, error) {
 		return nil, err
 	}
 
-	r := tpl.c.newRequest("POST", "/v2/tpl/get.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/get.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)
@@ -126,7 +133,7 @@ func (tpl *TPL) GetDefault(input *TPLGetRequest) (*TPLResponse, error) {
 		return nil, err
 	}
 
-	r := tpl.c.newRequest("POST", "/v2/tpl/get_default.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/get_default.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)
@@ -152,7 +159,7 @@ func (tpl *TPL) GetDefault(input *TPLGetRequest) (*TPLResponse, error) {
 // List - 获取模版列表接口
 func (tpl *TPL) List() ([]*TPLResponse, error) {
 	input := &TPLGetRequest{}
-	r := tpl.c.newRequest("POST", "/v2/tpl/get.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/get.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)
@@ -178,7 +185,7 @@ func (tpl *TPL) List() ([]*TPLResponse, error) {
 // ListDefault - 获取默认模版列表接口
 func (tpl *TPL) ListDefault() ([]*TPLResponse, error) {
 	input := &TPLGetRequest{}
-	r := tpl.c.newRequest("POST", "/v2/tpl/get_default.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/get_default.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)
@@ -203,8 +210,16 @@ func (tpl *TPL) ListDefault() ([]*TPLResponse, error) {
 
 // TPLUpdateRequest - 修改模版请求参数
 type TPLUpdateRequest struct {
-	ID      int64  `schema:"tpl_id,omitempty"`
-	Content string `schema:"tpl_content,omitempty"`
+	ID       int64  `schema:"tpl_id,omitempty"`
+	Content  string `schema:"tpl_content,omitempty"`
+	Language string `json:"lang,omitempty"`
+}
+
+// TPLUpdateResponse - 修改模版响应
+type TPLUpdateResponse struct {
+	Code     int         `json:"code"`
+	Message  string      `json:"msg"`
+	Template TPLResponse `json:"template"`
 }
 
 // Verify used to check the correctness of the request parameters
@@ -219,7 +234,7 @@ func (req *TPLUpdateRequest) Verify() error {
 }
 
 // Update - 修改模版接口
-func (tpl *TPL) Update(input *TPLUpdateRequest) (*TPLResponse, error) {
+func (tpl *TPL) Update(input *TPLUpdateRequest) (*TPLUpdateResponse, error) {
 	if input == nil {
 		input = &TPLUpdateRequest{}
 	}
@@ -229,7 +244,7 @@ func (tpl *TPL) Update(input *TPLUpdateRequest) (*TPLResponse, error) {
 		return nil, err
 	}
 
-	r := tpl.c.newRequest("POST", "/v2/tpl/update.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/update.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)
@@ -244,12 +259,34 @@ func (tpl *TPL) Update(input *TPLUpdateRequest) (*TPLResponse, error) {
 	}
 	defer resp.Body.Close()
 
-	var result TPLResponse
-	if err = tpl.c.handleResponse(resp, &result); err != nil {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return nil, err
 	}
 
-	return &result, nil
+	if resp.StatusCode >= http.StatusBadRequest {
+		var e ErrorResponse
+		if err := json.Unmarshal(body, &e); err != nil {
+			return nil, err
+		}
+		return nil, e
+	}
+
+	var result TPLResponse
+	if err = json.Unmarshal(body, &result); err == nil {
+		return &TPLUpdateResponse{
+			Code:     0,
+			Message:  "ok",
+			Template: result,
+		}, nil
+	}
+
+	var updateResult TPLUpdateResponse
+	if err = json.Unmarshal(body, &updateResult); err == nil {
+		return &updateResult, nil
+	}
+
+	return nil, fmt.Errorf("解析响应数据失败：%s", string(body))
 }
 
 // TPLDelRequest - 删除模板请求参数
@@ -276,7 +313,7 @@ func (tpl *TPL) Del(input *TPLDelRequest) (*TPLResponse, error) {
 		return nil, err
 	}
 
-	r := tpl.c.newRequest("POST", "/v2/tpl/del.json")
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/del.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := tpl.c.encodeFormBody(input)

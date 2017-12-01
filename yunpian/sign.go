@@ -59,7 +59,7 @@ func (sign *Sign) Add(input *SignAddRequest) (*SignAddResponse, error) {
 		return nil, err
 	}
 
-	r := sign.c.newRequest("POST", "/v2/sign/add.json")
+	r := sign.c.newRequest("POST", sign.c.config.signHost, "/v2/sign/add.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sign.c.encodeFormBody(input)
@@ -115,7 +115,7 @@ func (sign *Sign) Get(input *SignGetRequest) (*SignGetResponse, error) {
 		input = &SignGetRequest{}
 	}
 
-	r := sign.c.newRequest("POST", "/v2/sign/get.json")
+	r := sign.c.newRequest("POST", sign.c.config.signHost, "/v2/sign/get.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sign.c.encodeFormBody(input)
@@ -187,7 +187,7 @@ func (sign *Sign) Update(input *SignUpdateRequest) (*SignUpdateResponse, error) 
 		return nil, err
 	}
 
-	r := sign.c.newRequest("POST", "/v2/sign/update.json")
+	r := sign.c.newRequest("POST", sign.c.config.signHost, "/v2/sign/update.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sign.c.encodeFormBody(input)

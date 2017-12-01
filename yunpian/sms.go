@@ -63,7 +63,7 @@ func (sms *SMS) SingleSend(input *SingleSendRequest) (*SingleSendResponse, error
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/single_send.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/single_send.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -125,7 +125,7 @@ func (sms *SMS) BatchSend(input *BatchSendRequest) (*BatchSendResponse, error) {
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/batch_send.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/batch_send.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -187,7 +187,7 @@ func (sms *SMS) MultiSend(input *MultiSendRequest) (*MultiSendResponse, error) {
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/multi_send.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/multi_send.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -245,7 +245,7 @@ func (sms *SMS) TPLSingleSend(input *TPLSingleSendRequest) (*SingleSendResponse,
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/tpl_single_send.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/tpl_single_send.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -303,7 +303,7 @@ func (sms *SMS) TPLBatchSend(input *TPLBatchSendRequest) (*BatchSendResponse, er
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/tpl_batch_send.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/tpl_batch_send.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -347,7 +347,7 @@ func (sms *SMS) PullStatus(input *PullStatusRequest) ([]*PullStatusResponse, err
 		input = &PullStatusRequest{}
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/pull_status.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/pull_status.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -392,7 +392,7 @@ func (sms *SMS) PullReply(input *PullReplyRequest) ([]*PullReplyResponse, error)
 		input = &PullReplyRequest{}
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/pull_reply.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/pull_reply.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -461,7 +461,7 @@ func (sms *SMS) GetRecord(input *GetRecordRequest) ([]*GetRecordResponse, error)
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/get_record.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/get_record.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
@@ -517,7 +517,7 @@ func (sms *SMS) GetTotalFee(input *GetTotalFeeRequest) (*GetTotalFeeResponse, er
 		return nil, err
 	}
 
-	r := sms.c.newRequest("POST", "/v2/sms/get_total_fee.json")
+	r := sms.c.newRequest("POST", sms.c.config.smsHost, "/v2/sms/get_total_fee.json")
 	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 
 	reader, err := sms.c.encodeFormBody(input)
