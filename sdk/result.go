@@ -46,7 +46,7 @@ func (r *Result) String() string {
 }
 
 func (r *Result) IsSucc() bool {
-    return r.Data == SUCC
+    return r.Code == SUCC
 }
 
 func (r *Result) Error(err error) *Result {
