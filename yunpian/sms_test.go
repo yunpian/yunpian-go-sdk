@@ -29,3 +29,16 @@ func TestDecodeSingleSendResponseBody(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestGetTotalFee(t *testing.T) {
+	sms := TestClient.SMS()
+	input := &GetTotalFeeRequest{
+		Date: "2017-12-01",
+	}
+
+	resp, err := sms.GetTotalFee(input)
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log(resp.Count)
+}

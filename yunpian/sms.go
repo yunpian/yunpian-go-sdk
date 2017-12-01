@@ -414,3 +414,128 @@ func (sms *SMS) PullReply(input *PullReplyRequest) ([]*PullReplyResponse, error)
 
 	return result, nil
 }
+
+// GetRecordRequest - 查短信发送记录请求参数
+type GetRecordRequest struct {
+	Mobile    string `schema:"mobile,omitempty"`
+	StartTime string `schema:"start_time,omitempty"`
+	EndTime   string `schema:"end_time,omitempty"`
+	PageNum   int    `schema:"page_num,omitempty"`
+	PageSize  int    `schema:"page_size,omitempty"`
+	Type      string `schema:"type,omitempty"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *GetRecordRequest) Verify() error {
+	if len(req.StartTime) == 0 {
+		return errors.New("Miss param: start_time")
+	}
+	if len(req.EndTime) == 0 {
+		return errors.New("Miss param: end_time")
+	}
+	return nil
+}
+
+// GetRecordResponse - 查短信发送记录响应
+type GetRecordResponse struct {
+	SID             string  `json:"sid"`
+	Mobile          string  `json:"mobile"`
+	SendTime        string  `json:"send_time"`
+	Text            string  `json:"text"`
+	SendStatus      string  `json:"send_status"`
+	ReportStatus    string  `json:"report_status"`
+	Fee             float64 `json:"fee"`
+	UserReceiveTime string  `json:"user_receive_time"`
+	ErrorMessage    string  `json:"error_msg"`
+	UID             string  `json:"uid"`
+}
+
+// GetRecord - 查短信发送记录接口
+func (sms *SMS) GetRecord(input *GetRecordRequest) ([]*GetRecordResponse, error) {
+	if input == nil {
+		input = &GetRecordRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/get_record.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result []*GetRecordResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// GetTotalFeeRequest - 日账单导出请求参数
+type GetTotalFeeRequest struct {
+	Date string `schema:"date"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *GetTotalFeeRequest) Verify() error {
+	if len(req.Date) == 0 {
+		return errors.New("Miss param: date")
+	}
+	return nil
+}
+
+// GetTotalFeeResponse - 日账单导出响应
+type GetTotalFeeResponse struct {
+	Count        int    `json:"totalCount"`
+	Fee          string `json:"totalFee"`
+	SuccessCount int    `json:"totalSuccessCount"`
+	FailedCount  int    `json:"totalFailedCount"`
+	UnknownCount int    `json:"totalUnknownCount"`
+}
+
+// GetTotalFee - 日账单导出接口
+func (sms *SMS) GetTotalFee(input *GetTotalFeeRequest) (*GetTotalFeeResponse, error) {
+	if input == nil {
+		input = &GetTotalFeeRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := sms.c.newRequest("POST", "/v2/sms/get_total_fee.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := sms.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := sms.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result GetTotalFeeResponse
+	if err = sms.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
