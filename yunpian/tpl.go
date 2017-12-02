@@ -335,3 +335,118 @@ func (tpl *TPL) Del(input *TPLDelRequest) (*TPLResponse, error) {
 
 	return &result, nil
 }
+
+// TPLAddVoiceNotifyRequest - 添加语音通知模版请求参数
+type TPLAddVoiceNotifyRequest struct {
+	Content    string `schema:"tpl_content,omitempty"`
+	NotifyType int    `scheam:"notify_type,omitempty"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *TPLAddVoiceNotifyRequest) Verify() error {
+	if len(req.Content) == 0 {
+		return errors.New("Miss param: tpl_content")
+	}
+	return nil
+}
+
+// TPLAddVoiceNotifyResponse - 添加语音通知模版响应
+type TPLAddVoiceNotifyResponse struct {
+	ID          string `json:"tpl_id"`
+	Content     string `json:"tpl_content"`
+	CheckStatus string `json:"check_status"`
+	Reason      string `json:"reason"`
+}
+
+// AddVoiceNotify - 添加语音通知模版接口
+func (tpl *TPL) AddVoiceNotify(input *TPLAddVoiceNotifyRequest) (*TPLAddVoiceNotifyResponse, error) {
+	if input == nil {
+		input = &TPLAddVoiceNotifyRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/add_voice_notify.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := tpl.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := tpl.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result TPLAddVoiceNotifyResponse
+	if err = tpl.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+// TPLUpdateVoiceNotifyRequest - 修改语音通知模版请求参数
+type TPLUpdateVoiceNotifyRequest struct {
+	ID      int64  `schema:"tpl_id,omitempty"`
+	Content string `schema:"tpl_content,omitempty"`
+}
+
+// Verify used to check the correctness of the request parameters
+func (req *TPLUpdateVoiceNotifyRequest) Verify() error {
+	if req.ID == 0 {
+		return errors.New("Miss param: tpl_id")
+	}
+	if len(req.Content) == 0 {
+		return errors.New("Miss param: tpl_content")
+	}
+	return nil
+}
+
+// TPLUpdateVoiceNotifyResponse - 修改语音通知模版响应
+type TPLUpdateVoiceNotifyResponse struct {
+	ID          int64  `json:"tpl_id"`
+	Content     string `json:"tpl_content"`
+	CheckStatus string `json:"check_status"`
+	Reason      string `json:"reason"`
+}
+
+// UpdateVocieNotify - 修改语音通知模版接口
+func (tpl *TPL) UpdateVocieNotify(input *TPLUpdateVoiceNotifyRequest) (*TPLUpdateVoiceNotifyResponse, error) {
+	if input == nil {
+		input = &TPLUpdateVoiceNotifyRequest{}
+	}
+
+	err := input.Verify()
+	if err != nil {
+		return nil, err
+	}
+
+	r := tpl.c.newRequest("POST", tpl.c.config.tplHost, "/v2/tpl/update_voice_notify.json")
+	r.header.Set("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
+
+	reader, err := tpl.c.encodeFormBody(input)
+	if err != nil {
+		return nil, err
+	}
+	r.body = reader
+
+	resp, err := tpl.c.doRequest(r)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result TPLUpdateVoiceNotifyResponse
+	if err = tpl.c.handleResponse(resp, &result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
