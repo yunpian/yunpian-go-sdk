@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "rgaMre2umvQxtLCFDTtHVqFUBNs=",
+			"path": "github.com/FeiniuBus/yunpian-go-sdk/yunpian",
+			"revision": "a6ac42642ba3a350445e20b48ed4e0ed0cd6a3ec",
+			"revisionTime": "2017-12-04T14:39:47Z"
+		}
+	],
+	"rootPath": "github.com/FeiniuBus/yunpian-go-sdk/example"
+}
