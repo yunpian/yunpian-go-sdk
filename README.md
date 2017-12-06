@@ -55,3 +55,6 @@ SDK开源QQ群
 ## 文档链接
 - [api文档](https://www.yunpian.com/api2.0/guide.html)
 
+
+## 开源SDK列表
+- [飞牛巴士](https://github.com/FeiniuBus/yunpian-go-sdk/tree/master/yunpian)
