@@ -265,11 +265,11 @@ func (tpl *TPL) Update(input *TPLUpdateRequest) (*TPLUpdateResponse, error) {
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		var e ErrorResponse
-		if err := json.Unmarshal(body, &e); err != nil {
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
 			return nil, err
 		}
-		return nil, e
+		return nil, fmt.Errorf("请求失败: %s", string(data))
 	}
 
 	var result TPLResponse

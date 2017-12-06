@@ -2,6 +2,7 @@ package yunpian
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 )
 
@@ -14,6 +15,7 @@ func TestSingleSend(t *testing.T) {
 
 	resp, err := sms.SingleSend(input)
 	if err != nil {
+		fmt.Println(err.Error())
 		t.Error(err)
 	}
 	if !resp.IsSuccess() {
@@ -41,4 +43,19 @@ func TestGetTotalFee(t *testing.T) {
 		t.Error(err)
 	}
 	t.Log(resp.Count)
+}
+
+func TestBatchSend(t *testing.T) {
+	sms := TestClient.SMS()
+
+	input := &BatchSendRequest{
+		Mobile: "13320942172",
+		Text:   "Hello world",
+	}
+
+	_, err := sms.BatchSend(input)
+	if err != nil {
+		fmt.Println(err.Error())
+		t.Error(err)
+	}
 }

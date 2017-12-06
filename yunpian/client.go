@@ -3,7 +3,9 @@ package yunpian
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -106,11 +108,11 @@ func (c *Client) encodeFormBody(obj interface{}) (io.Reader, error) {
 
 func (c *Client) handleResponse(resp *http.Response, out interface{}) error {
 	if resp.StatusCode >= http.StatusBadRequest {
-		var err ErrorResponse
-		if e := c.decodeJSONBody(resp, &err); e != nil {
-			return e
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
 		}
-		return err
+		return fmt.Errorf("请求失败：%s", string(body))
 	}
 
 	return c.decodeJSONBody(resp, out)
@@ -118,6 +120,14 @@ func (c *Client) handleResponse(resp *http.Response, out interface{}) error {
 
 // decodeJSONBody is used to JSON decode a body
 func (c *Client) decodeJSONBody(resp *http.Response, out interface{}) error {
-	dec := json.NewDecoder(resp.Body)
-	return dec.Decode(out)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(body, out)
+	if err != nil {
+		return fmt.Errorf("解析响应体失败，原始响应体为：%s", string(body))
+	}
+	return nil
 }
